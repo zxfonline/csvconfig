@@ -9,7 +9,7 @@ import (
 	"io"
 	"os"
 	"path"
-	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/zxfonline/fileutil"
@@ -18,7 +18,7 @@ import (
 )
 
 var (
-	logger = golog.New("csvconfig")
+	logger = golog.New("CSVCONFIG")
 	//已经加载的文件缓存
 	_tables map[string]*Table
 	//文件路径
@@ -47,7 +47,7 @@ func Init(pathpre, suffix string) {
 	if filesuffix == "" {
 		filesuffix = ".csv"
 	}
-	pathpre = filepath.ToSlash(pathpre)
+	pathpre = strings.Replace(pathpre, "\\", "/", -1)
 	pathPre = pathpre
 
 	wd, _ := os.Getwd()
@@ -214,3 +214,70 @@ func GetAll(tableName string) []*Record {
 	}
 	return lines
 }
+
+// Int8Slice attaches the methods of Interface to []int8, sorting in increasing order.
+type Int8Slice []int8
+
+func (p Int8Slice) Len() int           { return len(p) }
+func (p Int8Slice) Less(i, j int) bool { return p[i] < p[j] }
+func (p Int8Slice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+
+// Sort is a convenience method.
+func (p Int8Slice) Sort() { sort.Sort(p) }
+
+// Ints8 sorts a slice of int8 in increasing order.
+func Ints8(a []int8) { sort.Sort(Int8Slice(a)) }
+
+// Int16Slice attaches the methods of Interface to []int16, sorting in increasing order.
+type Int16Slice []int16
+
+func (p Int16Slice) Len() int           { return len(p) }
+func (p Int16Slice) Less(i, j int) bool { return p[i] < p[j] }
+func (p Int16Slice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+
+// Sort is a convenience method.
+func (p Int16Slice) Sort() { sort.Sort(p) }
+
+// Ints32 sorts a slice of int16 in increasing order.
+func Ints16(a []int16) { sort.Sort(Int16Slice(a)) }
+
+// Int32Slice attaches the methods of Interface to []int32, sorting in increasing order.
+type Int32Slice []int32
+
+func (p Int32Slice) Len() int           { return len(p) }
+func (p Int32Slice) Less(i, j int) bool { return p[i] < p[j] }
+func (p Int32Slice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+
+// Sort is a convenience method.
+func (p Int32Slice) Sort() { sort.Sort(p) }
+
+// Ints32 sorts a slice of int32 in increasing order.
+func Ints32(a []int32) { sort.Sort(Int32Slice(a)) }
+
+// Int64Slice attaches the methods of Interface to []int64, sorting in increasing order.
+type Int64Slice []int64
+
+func (p Int64Slice) Len() int           { return len(p) }
+func (p Int64Slice) Less(i, j int) bool { return p[i] < p[j] }
+func (p Int64Slice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+
+// Sort is a convenience method.
+func (p Int64Slice) Sort() { sort.Sort(p) }
+
+// Ints64 sorts a slice of int64 in increasing order.
+func Ints64(a []int64) { sort.Sort(Int64Slice(a)) }
+
+// Float32Slice attaches the methods of Interface to []float32, sorting in increasing order.
+type Float32Slice []float32
+
+func (p Float32Slice) Len() int           { return len(p) }
+func (p Float32Slice) Less(i, j int) bool { return p[i] < p[j] || isNaN(p[i]) && !isNaN(p[j]) }
+func (p Float32Slice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+
+// isNaN is a copy of math.IsNaN to avoid a dependency on the math package.
+func isNaN(f float32) bool {
+	return f != f
+}
+
+// Sort is a convenience method.
+func (p Float32Slice) Sort() { sort.Sort(p) }
