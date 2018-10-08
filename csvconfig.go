@@ -19,7 +19,7 @@ import (
 )
 
 var (
-	logger = golog.New("CSVCONFIG")
+	logger = golog.New("CsvConfig")
 	//已经加载的文件缓存
 	_tables map[string]*Table
 	//文件路径
