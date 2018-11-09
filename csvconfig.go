@@ -9,9 +9,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path"
 	"sort"
-	"strings"
 
 	"github.com/zxfonline/fileutil"
 
@@ -23,8 +21,7 @@ var (
 	//已经加载的文件缓存
 	_tables map[string]*Table
 	//文件路径
-	pathPre     string
-	defaultDirs []string
+	pathPre string
 	//文件后缀
 	filesuffix string
 )
@@ -48,45 +45,11 @@ func Init(pathpre, suffix string) {
 	if filesuffix == "" {
 		filesuffix = ".csv"
 	}
-	pathpre = strings.Replace(pathpre, "\\", "/", -1)
 	pathPre = pathpre
-
-	wd, _ := os.Getwd()
-	arg0 := path.Clean(os.Args[0])
-	var exeFile string
-	if strings.HasPrefix(arg0, "/") {
-		exeFile = arg0
-	} else {
-		exeFile = path.Join(wd, arg0)
-	}
-	parent, _ := path.Split(exeFile)
-	defaultDirs = append(defaultDirs, path.Join(parent, "csv"))
-	defaultDirs = append(defaultDirs, path.Join(wd, "csv"))
 }
 
 func findFile(table string) (*os.File, error) {
-	if pathPre != "" {
-		fpath := fileutil.PathJoin(pathPre, table+filesuffix)
-		if fileutil.FileExists(fpath) {
-			f, err := os.Open(fpath)
-			if err != nil {
-				return nil, fmt.Errorf("Open file error:%v ,path=%v", err, fpath)
-			}
-			return f, nil
-		}
-	} else {
-		for _, dir := range defaultDirs {
-			fpath := fileutil.PathJoin(dir, table+filesuffix)
-			if fileutil.FileExists(fpath) {
-				f, err := os.Open(fpath)
-				if err != nil {
-					return nil, fmt.Errorf("Open file error:%v ,path=%v", err, fpath)
-				}
-				return f, nil
-			}
-		}
-	}
-	return nil, fmt.Errorf("file no found,table=%v", table)
+	return fileutil.FindFile(fileutil.PathJoin(pathPre, table+filesuffix), os.O_RDONLY, 0)
 }
 
 //加载所有配置文件，如果已经加载则覆盖
